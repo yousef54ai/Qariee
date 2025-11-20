@@ -58,7 +58,7 @@ export default function HomeScreen() {
           <Text style={styles.reciterName} numberOfLines={2}>
             {name}
           </Text>
-          <Text style={styles.surahCount}>114 {t('verses')}</Text>
+          <Text style={styles.surahCount}>114 Surahs</Text>
         </View>
       </TouchableOpacity>
     );

@@ -8,7 +8,6 @@ export interface Surah {
   number: number;
   name_ar: string;
   name_en: string;
-  verses: number;
 }
 
 export interface Download {

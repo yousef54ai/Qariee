@@ -19,8 +19,7 @@ export const initDatabase = async (): Promise<void> => {
       CREATE TABLE IF NOT EXISTS surahs (
         number INTEGER PRIMARY KEY,
         name_ar TEXT NOT NULL,
-        name_en TEXT NOT NULL,
-        verses INTEGER NOT NULL
+        name_en TEXT NOT NULL
       );
     `);
 
@@ -70,8 +69,8 @@ export const deleteAllReciters = async (): Promise<void> => {
 // Surahs
 export const insertSurah = async (surah: Surah): Promise<void> => {
   await db.runAsync(
-    'INSERT OR REPLACE INTO surahs (number, name_ar, name_en, verses) VALUES (?, ?, ?, ?)',
-    [surah.number, surah.name_ar, surah.name_en, surah.verses]
+    'INSERT OR REPLACE INTO surahs (number, name_ar, name_en) VALUES (?, ?, ?)',
+    [surah.number, surah.name_ar, surah.name_en]
   );
 };
 

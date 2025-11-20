@@ -64,11 +64,16 @@ This section documents major architectural and infrastructure decisions made dur
 
 **Core Features (Minimal but Polished):**
 
-1. **Reciter Library** - Browse 5-10 featured Quran reciters
+1. **Reciter Library** - Browse 3 featured Quran reciters (starting small)
 2. **Surah Streaming** - Instant playback of all 114 surahs per reciter
 3. **Persistent Audio Player** - Bottom mini-player + expandable full player
 4. **Offline Downloads** - Download surahs for offline listening, integrated with player
 5. **Downloaded Library** - Access all offline content
+
+**Initial Reciters (3 only for MVP):**
+- Mishary Rashid Alafasy
+- Abdul Basit Abdul Samad
+- Abdur-Rahman As-Sudais
 
 **Explicitly NOT in MVP:**
 - User accounts / authentication
@@ -317,7 +322,6 @@ qariee-audio/                    (R2 Bucket)
 - Surah number (1-114)
 - Arabic name
 - English name
-- Verse count
 
 #### URL Construction
 
@@ -341,7 +345,6 @@ All URLs constructed from reciter ID:
 **Surahs Table:**
 - Number (1-114)
 - Name (English and Arabic)
-- Verse count
 
 **Downloads Table:**
 - Reciter ID + Surah number (composite key)
@@ -355,20 +358,295 @@ All URLs constructed from reciter ID:
 
 #### Content Management
 
+**MVP Strategy:**
+- Start with **3 reciters only** to keep scope manageable
+- Expand gradually after validating core functionality
+- Quality over quantity approach
+
 **Adding New Reciters:**
 1. Prepare complete reciter folder (all 114 surahs required)
 2. Upload audio files to R2: `/audio/{reciter-id}/001.mp3` through `114.mp3`
 3. Upload reciter photo to R2: `/images/reciters/{reciter-id}.jpg`
 4. Update `reciters.json` with new entry
-5. Users receive update on next app launch automatically
+5. Users receive update on next app launch automatically (background sync)
 
 **Rules:**
 - Only complete reciters (all 114 surahs) are added
 - No partial collections
 - Ensures consistent experience across all reciters
+- Start small, scale gradually
+
+---
+
+## Project Structure
+
+```
+qariee/
+├── README.md                    # Main project documentation
+│
+└── app/                         # React Native app (Expo)
+    ├── app/                     # Expo Router app directory
+    │   ├── _layout.tsx          # Root layout with data initialization
+    │   ├── index.tsx            # Root redirect to tabs
+    │   └── (tabs)/              # Tab navigation
+    │       ├── _layout.tsx      # Tab bar configuration
+    │       ├── index.tsx        # Home screen (Reciters grid)
+    │       └── library.tsx      # Library screen (Downloads)
+    │
+    ├── src/                     # Source code
+    │   ├── services/            # Core services
+    │   │   ├── database.ts      # SQLite database operations
+    │   │   ├── dataSync.ts      # Background data sync logic
+    │   │   └── i18n.ts          # Internationalization setup
+    │   │
+    │   ├── constants/           # App constants
+    │   │   └── config.ts        # CDN URLs and configuration
+    │   │
+    │   ├── types/               # TypeScript type definitions
+    │   │   └── index.ts         # Reciter, Surah, Download types
+    │   │
+    │   ├── components/          # Reusable UI components (future)
+    │   ├── hooks/               # Custom React hooks (future)
+    │   └── utils/               # Utility functions (future)
+    │
+    ├── assets/                  # Static assets
+    │   └── data/
+    │       └── surahs.json      # All 114 surahs (bundled)
+    │
+    ├── package.json             # Dependencies and scripts
+    ├── app.json                 # Expo configuration
+    └── tsconfig.json            # TypeScript configuration
+```
+
+---
+
+## Dependencies
+
+### Core Framework
+- **React Native 0.81.5** - Mobile app framework
+- **Expo ~54.0.25** - Development platform and build tools
+- **Expo Router ~6.0.15** - File-based routing
+
+### Navigation
+- **@react-navigation/native ^7.1.8** - Navigation library
+- **@react-navigation/bottom-tabs ^7.4.0** - Bottom tab navigation
+- **react-native-screens ~4.16.0** - Native screen components
+- **react-native-safe-area-context ~5.6.0** - Safe area handling
+
+### Data & Storage
+- **expo-sqlite** - SQLite database for local storage
+- **expo-file-system** - File system access for downloads
+- **@react-native-async-storage/async-storage** - Key-value storage
+
+### Audio
+- **react-native-track-player** - Audio playback and background support
+
+### Internationalization
+- **i18next** - i18n framework
+- **react-i18next** - React bindings for i18next
+
+### UI & Animations
+- **react-native-gesture-handler ~2.28.0** - Touch gestures
+- **react-native-reanimated ~4.1.1** - Smooth animations
+- **@expo/vector-icons ^15.0.3** - Icon library (Ionicons)
+
+### Development
+- **TypeScript ~5.9.2** - Type safety
+- **ESLint ^9.25.0** - Code linting
+- **expo-dev-client ~6.0.18** - Custom development builds
 
 ---
 
 ## Getting Started
 
-[Setup instructions coming soon...]
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- Android Studio (for Android development)
+- Expo CLI
+
+### Installation
+
+1. **Clone the repository:**
+```bash
+git clone <repository-url>
+cd qariee/app
+```
+
+2. **Install dependencies:**
+```bash
+npm install
+```
+
+3. **Start the development server:**
+```bash
+npm start
+```
+
+4. **Run on Android:**
+```bash
+npm run android
+```
+
+### Development Scripts
+
+```bash
+npm start          # Start Expo development server
+npm run android    # Run on Android emulator/device
+npm run ios        # Run on iOS simulator (macOS only)
+npm run web        # Run in web browser
+npm run lint       # Run ESLint
+```
+
+---
+
+## Implementation Status
+
+### ✅ Completed (MVP Foundation)
+
+**Infrastructure:**
+- [x] Project setup with Expo and React Native
+- [x] TypeScript configuration
+- [x] File-based routing with Expo Router
+- [x] SQLite database schema and operations
+- [x] Background data sync service
+- [x] i18n setup (English/Arabic support)
+
+**UI Screens:**
+- [x] Root layout with app initialization
+- [x] Bottom tab navigation (Home, Library)
+- [x] Home screen with reciters grid
+- [x] Library screen with downloads list
+- [x] Loading states and splash screen
+
+**Data:**
+- [x] Complete surahs.json (all 114 surahs)
+- [x] Database models for reciters, surahs, downloads
+- [x] URL construction helpers for CDN assets
+
+### 🚧 In Progress / TODO
+
+**Core Features:**
+- [ ] Reciter detail screen (surah list)
+- [ ] Audio player integration (React Native Track Player)
+- [ ] Download functionality (FileSystem)
+- [ ] Full player UI (bottom sheet modal)
+- [ ] Mini player component (persistent)
+- [ ] Background playback controls
+- [ ] Notification controls
+
+**Data & Content:**
+- [ ] Upload 3 initial reciters to R2
+- [ ] Create sample reciters.json
+- [ ] Test background data sync
+
+**Polish:**
+- [ ] Dark theme refinement
+- [ ] Loading skeletons
+- [ ] Error handling and retry logic
+- [ ] Offline mode indicators
+- [ ] Download progress UI
+
+---
+
+## Database Schema
+
+### Tables
+
+**reciters**
+```sql
+CREATE TABLE reciters (
+  id TEXT PRIMARY KEY,
+  name_en TEXT NOT NULL,
+  name_ar TEXT NOT NULL
+);
+```
+
+**surahs**
+```sql
+CREATE TABLE surahs (
+  number INTEGER PRIMARY KEY,
+  name_ar TEXT NOT NULL,
+  name_en TEXT NOT NULL
+);
+```
+
+**downloads**
+```sql
+CREATE TABLE downloads (
+  reciter_id TEXT NOT NULL,
+  surah_number INTEGER NOT NULL,
+  local_file_path TEXT NOT NULL,
+  downloaded_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (reciter_id, surah_number)
+);
+```
+
+**app_metadata**
+```sql
+CREATE TABLE app_metadata (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+```
+
+---
+
+## Key Features Implemented
+
+### 1. Background Data Sync
+- First launch: Fetches reciters.json from R2, shows loading screen
+- Subsequent launches: Instant startup, updates in background
+- Offline-first architecture
+
+### 2. Database Operations
+- Full CRUD operations for reciters, surahs, downloads
+- Async/await API
+- Type-safe queries with TypeScript
+
+### 3. Internationalization
+- English and Arabic support
+- Dynamic language switching (ready for implementation)
+- RTL support ready
+
+### 4. URL Construction
+- CDN URLs built from reciter IDs
+- Single configuration point
+- Easy to migrate CDN providers
+
+---
+
+## Changelog
+
+### 2025-11-20 - MVP Foundation
+
+**Added:**
+- Initial project setup with Expo and React Native
+- SQLite database with schema for reciters, surahs, and downloads
+- Background data synchronization service
+- Tab navigation (Home and Library screens)
+- Home screen with reciters grid layout
+- Library screen with downloads list
+- Complete surahs.json with all 114 surahs
+- i18n support for English and Arabic
+- TypeScript type definitions
+- URL construction helpers for R2 CDN
+
+**Technical:**
+- expo-sqlite for local database
+- expo-file-system for file downloads
+- react-native-track-player for audio playback
+- i18next for internationalization
+- Expo Router for file-based navigation
+
+**Design:**
+- Dark theme (Spotify-inspired)
+- Modern, clean UI with rounded corners
+- 2-column grid for reciter cards
+- Bottom tab navigation
+
+---
+
+## License
+
+[License information to be added]
