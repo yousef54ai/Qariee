@@ -1,52 +1,53 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { I18nManager } from 'react-native';
+import * as Localization from 'expo-localization';
+
+// Import translation files
+import en from '../locales/en.json';
+import ar from '../locales/ar.json';
 
 const resources = {
   en: {
-    translation: {
-      home: 'Home',
-      library: 'Library',
-      reciters: 'Reciters',
-      downloads: 'Downloads',
-      loading: 'Loading...',
-      play: 'Play',
-      pause: 'Pause',
-      download: 'Download',
-      downloading: 'Downloading...',
-      downloaded: 'Downloaded',
-      verses: 'verses',
-      surah: 'Surah',
-      update_available: 'A new version of Qariee is available! Please update to get the latest features and improvements.',
-      update: 'Update',
-    },
+    translation: en,
   },
   ar: {
-    translation: {
-      home: 'الرئيسية',
-      library: 'المكتبة',
-      reciters: 'القراء',
-      downloads: 'التنزيلات',
-      loading: 'جاري التحميل...',
-      play: 'تشغيل',
-      pause: 'إيقاف',
-      download: 'تنزيل',
-      downloading: 'جاري التنزيل...',
-      downloaded: 'تم التنزيل',
-      verses: 'آيات',
-      surah: 'سورة',
-      update_available: 'يتوفر إصدار جديد من قارئي! يرجى التحديث للحصول على أحدث الميزات والتحسينات.',
-      update: 'تحديث',
-    },
+    translation: ar,
   },
 };
 
+// Helper to check if current language is RTL
+export const isRTL = (): boolean => {
+  return i18n.language === 'ar';
+};
+
+// Helper to get text direction
+export const getTextDirection = (): 'rtl' | 'ltr' => {
+  return isRTL() ? 'rtl' : 'ltr';
+};
+
+// Update RTL when language changes
+i18n.on('languageChanged', (lng) => {
+  const isRTLLang = lng === 'ar';
+  I18nManager.forceRTL(isRTLLang);
+  // Note: Changing RTL requires app reload in React Native
+});
+
+// Detect device language
+const deviceLanguage = Localization.getLocales()[0]?.languageCode || 'en';
+const initialLanguage = deviceLanguage === 'ar' ? 'ar' : 'en';
+
 i18n.use(initReactI18next).init({
   resources,
-  lng: 'en', // Default language
+  lng: initialLanguage, // Auto-detect language
   fallbackLng: 'en',
+  compatibilityJSON: 'v3', // For React Native
   interpolation: {
     escapeValue: false,
   },
 });
+
+// Set initial RTL based on detected language
+I18nManager.forceRTL(i18n.language === 'ar');
 
 export default i18n;
