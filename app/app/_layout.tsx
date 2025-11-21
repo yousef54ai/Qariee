@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { AudioProvider, useAudio } from '../src/contexts/AudioContext';
 import '../src/services/i18n'; // Initialize i18n
 import { initializeApp } from '../src/services/dataSync';
 
-export default function RootLayout() {
+function RootLayoutContent() {
   const [isReady, setIsReady] = useState(false);
+  const { setNeedsUpdate } = useAudio();
 
   useEffect(() => {
     async function prepare() {
       try {
-        const { isFirstLaunch } = await initializeApp();
+        const { isFirstLaunch, needsUpdate } = await initializeApp();
 
         if (isFirstLaunch) {
           console.log('First launch: Data loaded');
@@ -18,6 +21,7 @@ export default function RootLayout() {
           console.log('Using cached data, updating in background');
         }
 
+        setNeedsUpdate(needsUpdate);
         setIsReady(true);
       } catch (error) {
         console.error('App initialization error:', error);
@@ -39,6 +43,16 @@ export default function RootLayout() {
   }
 
   return <Stack screenOptions={{ headerShown: false }} />;
+}
+
+export default function RootLayout() {
+  return (
+    <SafeAreaProvider>
+      <AudioProvider>
+        <RootLayoutContent />
+      </AudioProvider>
+    </SafeAreaProvider>
+  );
 }
 
 const styles = StyleSheet.create({

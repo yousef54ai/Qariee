@@ -17,6 +17,20 @@ export interface Download {
   downloaded_at: string;
 }
 
+export interface AppSettings {
+  cdn_base_url: string;
+  app_name: string;
+  support_email: string;
+  app_version: string;
+  min_app_version: string;
+}
+
+export interface AppDatabase {
+  version: string;
+  settings: AppSettings;
+  reciters: Reciter[];
+}
+
 export interface ReciterMetadata {
   reciters: Reciter[];
 }

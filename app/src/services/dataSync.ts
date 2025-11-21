@@ -8,20 +8,31 @@ import {
   setMetadata,
   getMetadata,
 } from './database';
-import { RECITERS_METADATA_URL } from '../constants/config';
-import { ReciterMetadata } from '../types';
+import { getAppDatabaseUrl, setCdnBaseUrl } from '../constants/config';
+import { AppDatabase } from '../types';
 import surahsData from '../../assets/data/surahs.json';
 
 const FIRST_LAUNCH_KEY = 'first_launch_complete';
+const APP_VERSION = '1.0.0'; // Should match package.json version
 
 /**
  * Initialize app on first launch or subsequent launches
  * - First launch: Loads data with loading screen
  * - Subsequent launches: Returns immediately, updates in background
  */
-export const initializeApp = async (): Promise<{ isFirstLaunch: boolean }> => {
+export const initializeApp = async (): Promise<{
+  isFirstLaunch: boolean;
+  needsUpdate: boolean;
+}> => {
   // Always initialize database
   await initDatabase();
+
+  // Load cached CDN URL if available
+  const cachedCdnUrl = await getMetadata('cdn_base_url');
+  if (cachedCdnUrl) {
+    setCdnBaseUrl(cachedCdnUrl);
+    console.log(`Using cached CDN URL: ${cachedCdnUrl}`);
+  }
 
   const isFirstLaunch = (await AsyncStorage.getItem(FIRST_LAUNCH_KEY)) === null;
 
@@ -30,13 +41,74 @@ export const initializeApp = async (): Promise<{ isFirstLaunch: boolean }> => {
     console.log('First launch: Loading initial data...');
     await loadInitialData();
     await AsyncStorage.setItem(FIRST_LAUNCH_KEY, 'true');
-    return { isFirstLaunch: true };
+    return { isFirstLaunch: true, needsUpdate: false };
   } else {
-    // Subsequent launch: Update in background
+    // Subsequent launch: Check for updates
+    const needsUpdate = await checkForUpdates();
+
+    // Update in background
     console.log('Subsequent launch: Using cached data, updating in background...');
     updateDataInBackground();
-    return { isFirstLaunch: false };
+
+    return {
+      isFirstLaunch: false,
+      needsUpdate
+    };
   }
+};
+
+/**
+ * Check if app needs update by comparing versions
+ */
+const checkForUpdates = async (): Promise<boolean> => {
+  try {
+    const response = await fetch(getAppDatabaseUrl());
+
+    if (!response.ok) {
+      console.warn('Update check failed:', response.status);
+      return false;
+    }
+
+    const data: AppDatabase = await response.json();
+
+    // Compare current app version with server version
+    const serverVersion = data.settings.app_version;
+    const minVersion = data.settings.min_app_version;
+
+    // Simple version comparison (assumes semver format: major.minor.patch)
+    const needsUpdate = compareVersions(APP_VERSION, serverVersion) < 0;
+    const isMandatory = compareVersions(APP_VERSION, minVersion) < 0;
+
+    console.log(`Version check: Current=${APP_VERSION}, Server=${serverVersion}, Min=${minVersion}`);
+
+    if (needsUpdate) {
+      console.log('Update available!');
+    }
+
+    return needsUpdate;
+  } catch (error) {
+    console.error('Error checking for updates:', error);
+    return false;
+  }
+};
+
+/**
+ * Compare two semver version strings
+ * Returns: -1 if v1 < v2, 0 if equal, 1 if v1 > v2
+ */
+const compareVersions = (v1: string, v2: string): number => {
+  const parts1 = v1.split('.').map(Number);
+  const parts2 = v2.split('.').map(Number);
+
+  for (let i = 0; i < 3; i++) {
+    const num1 = parts1[i] || 0;
+    const num2 = parts2[i] || 0;
+
+    if (num1 < num2) return -1;
+    if (num1 > num2) return 1;
+  }
+
+  return 0;
 };
 
 /**
@@ -58,17 +130,28 @@ const loadInitialData = async (): Promise<void> => {
 };
 
 /**
- * Fetch reciters from R2 and save to database
+ * Fetch app database from R2 and save settings and reciters
  */
 const fetchAndSaveReciters = async (): Promise<void> => {
   try {
-    const response = await fetch(RECITERS_METADATA_URL);
+    const response = await fetch(getAppDatabaseUrl());
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch reciters: ${response.status}`);
+      throw new Error(`Failed to fetch app database: ${response.status}`);
     }
 
-    const data: ReciterMetadata = await response.json();
+    const data: AppDatabase = await response.json();
+
+    // Save app settings
+    await setMetadata('cdn_base_url', data.settings.cdn_base_url);
+    await setMetadata('app_name', data.settings.app_name);
+    await setMetadata('support_email', data.settings.support_email);
+    await setMetadata('app_version', data.settings.app_version);
+    await setMetadata('min_app_version', data.settings.min_app_version);
+    await setMetadata('db_version', data.version);
+
+    // Update CDN URL in config
+    setCdnBaseUrl(data.settings.cdn_base_url);
 
     // Clear existing reciters
     await deleteAllReciters();
@@ -79,8 +162,9 @@ const fetchAndSaveReciters = async (): Promise<void> => {
     }
 
     console.log(`Loaded ${data.reciters.length} reciters`);
+    console.log(`Updated CDN URL: ${data.settings.cdn_base_url}`);
   } catch (error) {
-    console.error('Error fetching reciters:', error);
+    console.error('Error fetching app database:', error);
     throw error;
   }
 };
@@ -117,40 +201,38 @@ const loadSurahsData = async (): Promise<void> => {
 const updateDataInBackground = (): void => {
   (async () => {
     try {
-      // Fetch latest reciters
-      const response = await fetch(RECITERS_METADATA_URL);
+      // Fetch latest app database
+      const response = await fetch(getAppDatabaseUrl());
 
       if (!response.ok) {
         console.warn('Background update failed:', response.status);
         return;
       }
 
-      const data: ReciterMetadata = await response.json();
+      const data: AppDatabase = await response.json();
 
-      // Get current reciters from DB
-      const currentReciters = await getAllReciters();
-      const currentIds = currentReciters.map((r) => r.id);
-      const newIds = data.reciters.map((r) => r.id);
+      console.log('Updating app data...');
 
-      // Check if there are changes
-      const hasChanges =
-        currentIds.length !== newIds.length ||
-        newIds.some((id) => !currentIds.includes(id));
+      // Update app settings
+      await setMetadata('cdn_base_url', data.settings.cdn_base_url);
+      await setMetadata('app_name', data.settings.app_name);
+      await setMetadata('support_email', data.settings.support_email);
+      await setMetadata('app_version', data.settings.app_version);
+      await setMetadata('min_app_version', data.settings.min_app_version);
+      await setMetadata('db_version', data.version);
 
-      if (hasChanges) {
-        console.log('New reciters detected, updating...');
+      // Update CDN URL in config
+      setCdnBaseUrl(data.settings.cdn_base_url);
 
-        // Update database
-        await deleteAllReciters();
-        for (const reciter of data.reciters) {
-          await insertReciter(reciter);
-        }
-
-        console.log('Background update completed successfully');
-        // TODO: Emit event or show toast notification
-      } else {
-        console.log('No updates available');
+      // Always update database
+      await deleteAllReciters();
+      for (const reciter of data.reciters) {
+        await insertReciter(reciter);
       }
+
+      console.log('Background update completed successfully');
+      console.log(`Updated CDN URL: ${data.settings.cdn_base_url}`);
+      // TODO: Emit event or show toast notification
     } catch (error) {
       console.error('Background update error:', error);
       // Fail silently - don't disturb user experience

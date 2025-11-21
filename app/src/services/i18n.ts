@@ -16,6 +16,8 @@ const resources = {
       downloaded: 'Downloaded',
       verses: 'verses',
       surah: 'Surah',
+      update_available: 'A new version of Qariee is available! Please update to get the latest features and improvements.',
+      update: 'Update',
     },
   },
   ar: {
@@ -32,6 +34,8 @@ const resources = {
       downloaded: 'تم التنزيل',
       verses: 'آيات',
       surah: 'سورة',
+      update_available: 'يتوفر إصدار جديد من قارئي! يرجى التحديث للحصول على أحدث الميزات والتحسينات.',
+      update: 'تحديث',
     },
   },
 };

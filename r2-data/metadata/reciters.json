@@ -1,0 +1,19 @@
+{
+  "reciters": [
+    {
+      "id": "mishary-alafasy",
+      "name_en": "Mishary Alafasy",
+      "name_ar": "مشاري العفاسي"
+    },
+    {
+      "id": "abdul-basit",
+      "name_en": "Abdul Basit Abdul Samad",
+      "name_ar": "عبد الباسط عبد الصمد"
+    },
+    {
+      "id": "sudais",
+      "name_en": "Abdur-Rahman As-Sudais",
+      "name_ar": "عبد الرحمن السديس"
+    }
+  ]
+}

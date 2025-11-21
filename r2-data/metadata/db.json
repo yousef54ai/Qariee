@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "settings": {
+    "cdn_base_url": "https://pub-ab70d7236e61414aabfd72718fa65d27.r2.dev",
+    "app_name": "Qariee",
+    "support_email": "support@qariee.com",
+    "app_version": "1.0.0",
+    "min_app_version": "1.0.0"
+  },
+  "reciters": [
+    {
+      "id": "mishary-alafasy",
+      "name_en": "Mishary Alafasy",
+      "name_ar": "مشاري العفاسي"
+    },
+    {
+      "id": "abdul-basit",
+      "name_en": "Abdul Basit Abdul Samad",
+      "name_ar": "عبد الباسط عبد الصمد"
+    },
+    {
+      "id": "sudais",
+      "name_en": "Abdur-Rahman As-Sudais",
+      "name_ar": "عبد الرحمن السديس"
+    }
+  ]
+}

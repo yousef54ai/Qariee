@@ -288,7 +288,7 @@ Modal/Overlay:
 ```
 qariee-audio/                    (R2 Bucket)
 ├── metadata/
-│   └── reciters.json            (Reciter list - updated as needed)
+│   └── db.json                  (App settings, reciters, and configuration)
 │
 ├── audio/
 │   ├── mishary-alafasy/
@@ -312,16 +312,48 @@ qariee-audio/                    (R2 Bucket)
 
 #### Data Structure
 
-**reciters.json** (Remote - minimal structure):
-- Reciter ID (used to construct all URLs)
-- Name in English
-- Name in Arabic
-- No redundant data (photos/audio URLs derived from ID)
+**db.json** (Remote - centralized configuration):
+- **version**: Database schema version
+- **settings**: App-wide configuration
+  - `cdn_base_url`: Base URL for all CDN resources
+  - `app_name`: Application name
+  - `support_email`: Support contact
+  - `app_version`: Latest app version available
+  - `min_app_version`: Minimum required app version
+- **reciters**: Array of reciter objects
+  - Reciter ID (used to construct all URLs)
+  - Name in English
+  - Name in Arabic
 
 **surahs.json** (Bundled in app - static):
 - Surah number (1-114)
 - Arabic name
 - English name
+
+#### Remote Configuration & Version Management
+
+**Centralized Settings:**
+- All app settings stored in remote `db.json`
+- Downloaded and cached on app launch
+- Allows remote updates without app releases
+
+**Version Checking:**
+- App compares local version with `app_version` in db.json
+- Shows update banner when new version is available
+- Supports minimum version enforcement via `min_app_version`
+- Update messages localized via i18n (not in db.json)
+
+**CDN Failover:**
+- CDN base URL stored remotely in `cdn_base_url`
+- If domain is lost/changed, update db.json with new URL
+- All users receive new CDN URL on next launch
+- No app update required for CDN migrations
+
+**Benefits:**
+- Change CDN provider instantly
+- Push critical updates to all users
+- Enforce minimum app versions
+- Single source of truth for configuration
 
 #### URL Construction
 
@@ -439,7 +471,7 @@ qariee/
 - **@react-native-async-storage/async-storage** - Key-value storage
 
 ### Audio
-- **react-native-track-player** - Audio playback and background support
+- **expo-audio** - Audio playback and background support
 
 ### Internationalization
 - **i18next** - i18n framework
@@ -449,6 +481,7 @@ qariee/
 - **react-native-gesture-handler ~2.28.0** - Touch gestures
 - **react-native-reanimated ~4.1.1** - Smooth animations
 - **@expo/vector-icons ^15.0.3** - Icon library (Ionicons)
+- **react-native-image-colors** - Extract dominant colors from images
 
 ### Development
 - **TypeScript ~5.9.2** - Type safety
@@ -528,7 +561,7 @@ npm run lint       # Run ESLint
 
 **Core Features:**
 - [ ] Reciter detail screen (surah list)
-- [ ] Audio player integration (React Native Track Player)
+- [ ] Audio player integration (expo-audio)
 - [ ] Download functionality (FileSystem)
 - [ ] Full player UI (bottom sheet modal)
 - [ ] Mini player component (persistent)
@@ -618,6 +651,38 @@ CREATE TABLE app_metadata (
 
 ## Changelog
 
+### 2025-11-21 - UI Polish & Remote Configuration
+
+**Added:**
+- Safe area handling with react-native-safe-area-context
+- Mini player component with dynamic background colors
+- Color extraction from reciter images (react-native-image-colors)
+- Centralized app configuration via remote db.json
+- App version checking and update notifications
+- Update banner UI component with i18n support
+- AudioContext for global playback state management
+
+**Changed:**
+- Migrated from reciters.json to comprehensive db.json
+- Added app_version and min_app_version to remote config
+- CDN base URL now remotely configurable for failover support
+- Removed bottom tabs navigation (simplified MVP)
+- Made mini player persistent across all screens
+
+**Technical:**
+- Dynamic CDN URL configuration from remote settings
+- Semantic version comparison for update checks
+- i18n messages for update notifications (English/Arabic)
+- Global AudioContext provides needsUpdate state
+- Background color extraction using dominant colors from images
+
+**UI/UX:**
+- Mini player shows current track with reciter image
+- Background color adapts to reciter's image palette
+- Update banner appears at top of home screen when available
+- Play/pause button toggles based on playback state
+- Circular reciter images with proper safe area insets
+
 ### 2025-11-20 - MVP Foundation
 
 **Added:**
@@ -635,7 +700,7 @@ CREATE TABLE app_metadata (
 **Technical:**
 - expo-sqlite for local database
 - expo-file-system for file downloads
-- react-native-track-player for audio playback
+- expo-audio for audio playback
 - i18next for internationalization
 - Expo Router for file-based navigation
 
