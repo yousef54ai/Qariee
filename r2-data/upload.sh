@@ -9,7 +9,7 @@ echo "📦 Uploading to R2 bucket: $BUCKET_NAME"
 
 # Upload metadata
 echo "⬆️  Uploading metadata..."
-wrangler r2 object put $BUCKET_NAME/metadata/reciters.json --file=./metadata/reciters.json
+wrangler r2 object put $BUCKET_NAME/metadata/db.json --file=./metadata/db.json
 
 # Upload images (if exist)
 if [ -f "./images/reciters/mishary-alafasy.jpg" ]; then
@@ -20,4 +20,4 @@ if [ -f "./images/reciters/mishary-alafasy.jpg" ]; then
 fi
 
 echo "✅ Upload complete!"
-echo "🌐 Test URL: https://pub-ab70d7236e61414aabfd72718fa65d27.r2.dev/metadata/reciters.json"
+echo "🌐 Test URL: https://pub-ab70d7236e61414aabfd72718fa65d27.r2.dev/metadata/db.json"

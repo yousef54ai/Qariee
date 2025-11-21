@@ -10,7 +10,9 @@ export const initDatabase = async (): Promise<void> => {
       CREATE TABLE IF NOT EXISTS reciters (
         id TEXT PRIMARY KEY,
         name_en TEXT NOT NULL,
-        name_ar TEXT NOT NULL
+        name_ar TEXT NOT NULL,
+        color_primary TEXT NOT NULL,
+        color_secondary TEXT NOT NULL
       );
     `);
 
@@ -42,6 +44,9 @@ export const initDatabase = async (): Promise<void> => {
       );
     `);
 
+    // Run migrations
+    await runMigrations();
+
     console.log('Database initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
@@ -49,17 +54,53 @@ export const initDatabase = async (): Promise<void> => {
   }
 };
 
+const runMigrations = async (): Promise<void> => {
+  try {
+    // Check if color columns exist in reciters table
+    const tableInfo = await db.getAllAsync<{ name: string }>(
+      'PRAGMA table_info(reciters)'
+    );
+
+    const hasColorPrimary = tableInfo.some((col) => col.name === 'color_primary');
+    const hasColorSecondary = tableInfo.some((col) => col.name === 'color_secondary');
+
+    // Add color columns if they don't exist
+    if (!hasColorPrimary) {
+      console.log('Running migration: Adding color_primary column');
+      await db.execAsync('ALTER TABLE reciters ADD COLUMN color_primary TEXT DEFAULT "#282828"');
+    }
+
+    if (!hasColorSecondary) {
+      console.log('Running migration: Adding color_secondary column');
+      await db.execAsync('ALTER TABLE reciters ADD COLUMN color_secondary TEXT DEFAULT "#404040"');
+    }
+
+    console.log('Migrations completed successfully');
+  } catch (error) {
+    console.error('Error running migrations:', error);
+    throw error;
+  }
+};
+
 // Reciters
 export const insertReciter = async (reciter: Reciter): Promise<void> => {
   await db.runAsync(
-    'INSERT OR REPLACE INTO reciters (id, name_en, name_ar) VALUES (?, ?, ?)',
-    [reciter.id, reciter.name_en, reciter.name_ar]
+    'INSERT OR REPLACE INTO reciters (id, name_en, name_ar, color_primary, color_secondary) VALUES (?, ?, ?, ?, ?)',
+    [reciter.id, reciter.name_en, reciter.name_ar, reciter.color_primary, reciter.color_secondary]
   );
 };
 
 export const getAllReciters = async (): Promise<Reciter[]> => {
   const result = await db.getAllAsync<Reciter>('SELECT * FROM reciters ORDER BY id');
   return result;
+};
+
+export const getReciterById = async (id: string): Promise<Reciter | null> => {
+  const result = await db.getFirstAsync<Reciter>(
+    'SELECT * FROM reciters WHERE id = ?',
+    [id]
+  );
+  return result || null;
 };
 
 export const deleteAllReciters = async (): Promise<void> => {

@@ -5,10 +5,30 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AudioProvider, useAudio } from '../src/contexts/AudioContext';
 import '../src/services/i18n'; // Initialize i18n
 import { initializeApp } from '../src/services/dataSync';
+import {
+  useFonts,
+  Tajawal_400Regular,
+  Tajawal_500Medium,
+  Tajawal_700Bold,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '../src/utils/fonts';
 
 function RootLayoutContent() {
   const [isReady, setIsReady] = useState(false);
   const { setNeedsUpdate } = useAudio();
+  const [fontsLoaded] = useFonts({
+    Tajawal_400Regular,
+    Tajawal_500Medium,
+    Tajawal_700Bold,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    SurahNames: require('../assets/fonts/surah_names.ttf'),
+  });
 
   useEffect(() => {
     async function prepare() {
@@ -33,7 +53,7 @@ function RootLayoutContent() {
     prepare();
   }, []);
 
-  if (!isReady) {
+  if (!isReady || !fontsLoaded) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#1DB954" />

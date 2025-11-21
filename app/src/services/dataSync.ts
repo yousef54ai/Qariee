@@ -62,7 +62,15 @@ export const initializeApp = async (): Promise<{
  */
 const checkForUpdates = async (): Promise<boolean> => {
   try {
-    const response = await fetch(getAppDatabaseUrl());
+    // Add cache-busting parameter to force fresh fetch
+    const url = `${getAppDatabaseUrl()}?t=${Date.now()}`;
+    const response = await fetch(url, {
+      cache: 'no-cache',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    });
 
     if (!response.ok) {
       console.warn('Update check failed:', response.status);
@@ -134,7 +142,15 @@ const loadInitialData = async (): Promise<void> => {
  */
 const fetchAndSaveReciters = async (): Promise<void> => {
   try {
-    const response = await fetch(getAppDatabaseUrl());
+    // Add cache-busting parameter to force fresh fetch
+    const url = `${getAppDatabaseUrl()}?t=${Date.now()}`;
+    const response = await fetch(url, {
+      cache: 'no-cache',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`Failed to fetch app database: ${response.status}`);
@@ -201,8 +217,15 @@ const loadSurahsData = async (): Promise<void> => {
 const updateDataInBackground = (): void => {
   (async () => {
     try {
-      // Fetch latest app database
-      const response = await fetch(getAppDatabaseUrl());
+      // Fetch latest app database with cache-busting
+      const url = `${getAppDatabaseUrl()}?t=${Date.now()}`;
+      const response = await fetch(url, {
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
 
       if (!response.ok) {
         console.warn('Background update failed:', response.status);

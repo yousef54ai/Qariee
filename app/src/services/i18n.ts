@@ -21,6 +21,11 @@ export const isRTL = (): boolean => {
   return i18n.language === 'ar';
 };
 
+// Helper to check if current language is Arabic
+export const isArabic = (): boolean => {
+  return i18n.language === 'ar';
+};
+
 // Helper to get text direction
 export const getTextDirection = (): 'rtl' | 'ltr' => {
   return isRTL() ? 'rtl' : 'ltr';

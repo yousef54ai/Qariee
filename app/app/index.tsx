@@ -10,21 +10,26 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router';
 import { getAllReciters } from '../src/services/database';
 import { getReciterPhotoUrl } from '../src/constants/config';
 import { Reciter } from '../src/types';
 import MiniPlayer from '../src/components/MiniPlayer';
 import UpdateBanner from '../src/components/UpdateBanner';
 import { useAudio } from '../src/contexts/AudioContext';
+import { isArabic } from '../src/services/i18n';
+import { getFontFamily } from '../src/utils/fonts';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2; // 2 columns with padding
 
 export default function HomeScreen() {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
   const { needsUpdate, setNeedsUpdate } = useAudio();
   const [reciters, setReciters] = useState<Reciter[]>([]);
   const [loading, setLoading] = useState(true);
+  const arabic = isArabic();
 
   useEffect(() => {
     loadReciters();
@@ -49,8 +54,7 @@ export default function HomeScreen() {
       <TouchableOpacity
         style={styles.card}
         onPress={() => {
-          // TODO: Navigate to reciter detail
-          console.log('Navigate to reciter:', item.id);
+          router.push(`/reciter/${item.id}`);
         }}
         activeOpacity={0.8}
       >
@@ -61,7 +65,10 @@ export default function HomeScreen() {
           resizeMode="cover"
         />
         <View style={styles.cardInfo}>
-          <Text style={styles.reciterName} numberOfLines={2}>
+          <Text
+            style={[styles.reciterName, { fontFamily: getFontFamily(arabic, 'medium') }]}
+            numberOfLines={2}
+          >
             {name}
           </Text>
         </View>
@@ -89,7 +96,9 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {needsUpdate && <UpdateBanner onDismiss={() => setNeedsUpdate(false)} />}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('reciters')}</Text>
+        <Text style={[styles.headerTitle, { fontFamily: getFontFamily(arabic, 'bold') }]}>
+          {t('reciters')}
+        </Text>
       </View>
       <FlatList
         data={reciters}
@@ -122,7 +131,6 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 32,
-    fontWeight: 'bold',
     color: '#FFFFFF',
   },
   listContent: {
@@ -149,7 +157,6 @@ const styles = StyleSheet.create({
   },
   reciterName: {
     fontSize: 14,
-    fontWeight: '500',
     color: '#B3B3B3',
     textAlign: 'center',
   },

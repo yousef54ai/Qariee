@@ -11,17 +11,23 @@
     {
       "id": "mishary-alafasy",
       "name_en": "Mishary Alafasy",
-      "name_ar": "مشاري العفاسي"
+      "name_ar": "مشاري العفاسي",
+      "color_primary": "#E8E8E8",
+      "color_secondary": "#F5F5F5"
     },
     {
       "id": "abdul-basit",
       "name_en": "Abdul Basit Abdul Samad",
-      "name_ar": "عبد الباسط عبد الصمد"
+      "name_ar": "عبد الباسط عبد الصمد",
+      "color_primary": "#FF6B6B",
+      "color_secondary": "#FFA5A5"
     },
     {
       "id": "sudais",
       "name_en": "Abdur-Rahman As-Sudais",
-      "name_ar": "عبد الرحمن السديس"
+      "name_ar": "عبد الرحمن السديس",
+      "color_primary": "#FFE66D",
+      "color_secondary": "#FFF4A3"
     }
   ]
 }

@@ -18,6 +18,11 @@ export const getReciterPhotoUrl = (reciterId: string): string => {
 };
 
 export const getAudioUrl = (reciterId: string, surahNumber: number): string => {
+  // TODO: Use R2 URLs when audio files are uploaded
+  // const surahPadded = surahNumber.toString().padStart(3, '0');
+  // return `${CDN_BASE_URL}/audio/${reciterId}/${surahPadded}.mp3`;
+
+  // Demo: Using mp3quran.net for testing
   const surahPadded = surahNumber.toString().padStart(3, '0');
-  return `${CDN_BASE_URL}/audio/${reciterId}/${surahPadded}.mp3`;
+  return `https://server13.mp3quran.net/husr/${surahPadded}.mp3`;
 };

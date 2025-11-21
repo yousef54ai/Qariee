@@ -2,6 +2,8 @@ export interface Reciter {
   id: string;
   name_en: string;
   name_ar: string;
+  color_primary: string;
+  color_secondary: string;
 }
 
 export interface Surah {
