@@ -38,13 +38,12 @@
 - [ ] Allow downloads during playback
 - [ ] Calculate and display storage used
 
-### 5. Library Screen
-- [ ] Create library/downloads screen
-- [ ] Group downloads by reciter
-- [ ] Show all downloaded surahs
-- [ ] Add play functionality for offline surahs
-- [ ] Show total storage used
-- [ ] Add delete functionality for downloads
+### 5. Offline Mode
+- [ ] Detect network connectivity
+- [ ] Show offline indicator in UI
+- [ ] Disable streaming when offline
+- [ ] Only show downloaded content when offline
+- [ ] Cache reciter images for offline use
 
 ## Medium Priority - Polish & UX
 
@@ -61,21 +60,14 @@
 - [ ] Handle corrupted download files
 - [ ] Add error boundaries for crashes
 
-### 8. Offline Mode
-- [ ] Detect network connectivity
-- [ ] Show offline indicator in UI
-- [ ] Disable streaming when offline
-- [ ] Only show downloaded content when offline
-- [ ] Cache reciter images for offline use
-
-### 9. Mini Player Enhancements
+### 8. Mini Player Enhancements
 - [ ] Connect mini player to actual audio playback
 - [ ] Update progress bar in real-time
 - [ ] Show correct play/pause state
 - [ ] Display current surah and reciter
 - [ ] Add swipe gestures for skip
 
-### 10. Update Banner Improvements
+### 9. Update Banner Improvements
 - [ ] Add app store link to update button
 - [ ] Handle different update scenarios (optional vs mandatory)
 - [ ] Persist dismissed state (don't show again for this version)
@@ -83,28 +75,27 @@
 
 ## Low Priority - Future Enhancements
 
-### 11. Performance Optimization
+### 10. Performance Optimization
 - [ ] Optimize reciter grid rendering
 - [ ] Implement image caching
 - [ ] Lazy load surah lists
 - [ ] Reduce app bundle size
 - [ ] Optimize database queries
 
-### 12. Accessibility
+### 11. Accessibility
 - [ ] Add screen reader support
 - [ ] Ensure proper focus management
 - [ ] Add accessibility labels
 - [ ] Support dynamic font sizes
-- [ ] Test with TalkBack/VoiceOver
 
-### 13. Analytics & Monitoring
+### 12. Analytics & Monitoring
 - [ ] Add crash reporting (Sentry?)
 - [ ] Track key user actions
 - [ ] Monitor download success rates
 - [ ] Track playback errors
 - [ ] Monitor app performance
 
-### 14. Testing
+### 13. Testing
 - [ ] Add unit tests for utility functions
 - [ ] Test version comparison logic
 - [ ] Test database operations
@@ -113,35 +104,19 @@
 
 ## Content & Data
 
-### 15. Audio Content
+### 14. Audio Content
 - [ ] Source high-quality MP3 files for 3 reciters
 - [ ] Ensure all 114 surahs per reciter
 - [ ] Optimize file sizes (128-192 kbps)
 - [ ] Upload all audio files to R2
 - [ ] Verify CDN access and streaming
 
-### 16. Images & Assets
+### 15. Images & Assets
 - [ ] Get professional reciter photos
 - [ ] Optimize image sizes
 - [ ] Create app icon
 - [ ] Create splash screen
 - [ ] Add placeholder images
-
-## Release Preparation
-
-### 17. App Store Assets
-- [ ] Create app screenshots
-- [ ] Write app description (English/Arabic)
-- [ ] Prepare privacy policy
-- [ ] Create promotional graphics
-- [ ] Record demo video
-
-### 18. Build & Deploy
-- [ ] Set up EAS Build for Android
-- [ ] Configure app signing
-- [ ] Test production build
-- [ ] Prepare Play Store listing
-- [ ] Submit for review
 
 ## Known Issues
 
