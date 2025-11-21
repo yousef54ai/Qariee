@@ -39,7 +39,7 @@ const initialLanguage = deviceLanguage === 'ar' ? 'ar' : 'en';
 
 i18n.use(initReactI18next).init({
   resources,
-  lng: initialLanguage, // Auto-detect language
+  lng: 'ar', // Force Arabic for development - TODO: Change to initialLanguage for production
   fallbackLng: 'en',
   compatibilityJSON: 'v3', // For React Native
   interpolation: {
